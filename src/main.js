@@ -32,22 +32,27 @@ class GameScene extends Phaser.Scene {
 		this.remainingTime;
 		this.coinMusic;
 		this.bgMusic;
+		this.poisonMusic;
 		this.emitter;
+		this.poisonEmitter;
 		this.poisonApple;
 	}
 
 	preload() {
-		this.load.image("bg", "assets/bg.png");
-		this.load.image("basket", "assets/basket.png");
-		this.load.image("apple", "assets/apple.png");
-		this.load.image("poisonApple", "assets/poisonApple.png");
-		this.load.image("money", "assets/money.png");
-		this.load.audio("coin", "assets/coin.mp3");
-		this.load.audio("bgMusic", "assets/bgMusic.mp3");
+		this.load.image("bg", "/images/bg.png");
+		this.load.image("basket", "/images/basket.png");
+		this.load.image("apple", "/images/apple.png");
+		this.load.image("poisonApple", "/images/poisonApple.png");
+		this.load.image("money", "/images/money.png");
+		this.load.image("poison", "/images/crossbones.png");
+		this.load.audio("coin", "audio/coin.mp3");
+		this.load.audio("bgMusic", "audio/bgMusic.mp3");
+		this.load.audio("poisonMusic", "audio/wrong.mp3");
 	}
 	create() {
 		this.coinMusic = this.sound.add("coin");
 		this.bgMusic = this.sound.add("bgMusic", { loop: true });
+		this.poisonMusic = this.sound.add("poisonMusic");
 		this.bgMusic.play();
 
 		this.add.image(0, 0, "bg").setOrigin(0, 0);
@@ -121,6 +126,23 @@ class GameScene extends Phaser.Scene {
 		);
 
 		this.emitter.stop();
+
+		this.poisonEmitter = this.add.particles(0, 0, "poison", {
+			speed: 100,
+			gravityY: speedDown - 200,
+			scale: 0.04,
+			duration: 1000,
+			emitting: false,
+		});
+
+		this.poisonEmitter.startFollow(
+			this.player,
+			this.player.width / 2,
+			this.player.height / 2,
+			true
+		);
+
+		this.poisonEmitter.stop();
 	}
 
 	update() {
@@ -163,6 +185,8 @@ class GameScene extends Phaser.Scene {
 	}
 
 	poisonHit() {
+		this.poisonMusic.play();
+		this.poisonEmitter.start();
 		this.poisonApple.setY(0);
 		this.poisonApple.setX(this.getRandomX());
 		if (this.points > 0) {
